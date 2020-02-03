@@ -124,3 +124,10 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+
+
+## Project-specific
+custom_nrf52832/_build/
+pca10040/_build/
+pca10056/_build/
+
