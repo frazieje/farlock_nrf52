@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="7a526dc9-6b85-46a1-a4ba-df93e0d1b26a" name="pca10056" projectName="farlock_nrf52">
+      <configuration id="51c1b2b9-03fe-412a-a4e1-77bf8902dbf6" name="pca10056" toolchainName="Default">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_pca10056" />
+        </build>
+        <clean type="TOOL">
+          <tool actionId="Tool_External Tools_pca10056_clean" />
+        </clean>
+      </configuration>
+    </target>
+    <target id="8553be00-4f5d-4163-afd4-adaf1af98b98" name="pca10040" projectName="farlock_nrf52">
+      <configuration id="bccb550f-44fe-4f5c-8b01-ca4a006f5381" name="pca10040" toolchainName="Default">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_pca10040" />
+        </build>
+        <clean type="TOOL">
+          <tool actionId="Tool_External Tools_pca10040_clean" />
+        </clean>
+      </configuration>
+    </target>
+  </component>
+</project>
