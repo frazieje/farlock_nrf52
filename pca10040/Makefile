@@ -6,7 +6,7 @@ SDK_ROOT := $(NRF_SDK_HOME)
 PROJ_DIR = ..
 
 $(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
-  LINKER_SCRIPT  := iot_lwip_mqtt_subscriber_gcc_nrf52.ld
+  LINKER_SCRIPT  := farlock_gcc_nrf52_s132.ld
 
 # Source files common to all targets
 SRC_FILES += \
@@ -17,7 +17,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/log/src/nrf_log_default_backends.c \
   $(SDK_ROOT)/components/libraries/log/src/nrf_log_frontend.c \
   $(SDK_ROOT)/components/libraries/log/src/nrf_log_str_formatter.c \
-  $(SDK_ROOT)/components/libraries/utf8/utf8.c \
+  $(PROJ_DIR)/utf8.c \
   $(SDK_ROOT)/components/boards/boards.c \
   $(SDK_ROOT)/external/lwip/src/core/def.c \
   $(SDK_ROOT)/external/lwip/src/core/dhcp.c \
@@ -94,7 +94,7 @@ SRC_FILES += \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
   $(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
   $(SDK_ROOT)/components/libraries/bsp/bsp.c \
-  $(PROJ_DIR)/main.c \
+  $(PROJ_DIR)/farlock.c \
   $(SDK_ROOT)/external/mbedtls/library/aes.c \
   $(SDK_ROOT)/external/mbedtls/library/aesni.c \
   $(SDK_ROOT)/external/mbedtls/library/arc4.c \
@@ -194,7 +194,6 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/ble/ble_services/ble_dis \
   $(SDK_ROOT)/components/nfc/ndef/conn_hand_parser/le_oob_rec_parser \
   $(SDK_ROOT)/components/libraries/fds \
-  $(SDK_ROOT)/components/libraries/utf8 \
   $(SDK_ROOT)/components/nfc/ndef/uri \
   $(SDK_ROOT)/components/libraries/crc16 \
   $(SDK_ROOT)/components/nfc/ndef/conn_hand_parser/ble_oob_advdata_parser \
@@ -435,8 +434,8 @@ flash: default
 
 # Flash softdevice
 flash_softdevice:
-	@echo Flashing: s132_nrf52_6.1.1_softdevice.hex
-	nrfjprog -f nrf52 --program $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_6.1.1_softdevice.hex --sectorerase
+	@echo Flashing: s132 nrf52 softdevice
+	nrfjprog -f nrf52 --program $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_*_softdevice.hex --sectorerase
 	nrfjprog -f nrf52 --reset
 
 erase:
