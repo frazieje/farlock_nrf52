@@ -61,15 +61,6 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
-static const ipv6_addr_t m_broker_addr =
-        {
-                .u8 =
-                        {0x20, 0x01, 0x0D, 0xB8,
-                         0x00, 0x00, 0x00, 0x00,
-                         0x00, 0x00, 0x00, 0x00,
-                         0x00, 0x00, 0x00, 0x01}
-        };
-
 static const uint8_t hexbytes[] =
         {0x00, 0x01, 0x02, 0x03,
          0x04, 0x05, 0x06, 0x07,
@@ -86,10 +77,10 @@ typedef enum
 
 typedef enum
 {
-    APP_MQTT_STATE_IDLE,                                                                            /**< Indicates no MQTT connection exists. */
+    APP_MQTT_STATE_IDLE,
     APP_MQTT_STATE_CONNECTING,
-    APP_MQTT_STATE_CONNECTED,                                                                       /**< Indicates MQTT connection is established. */
-    APP_MQTT_STATE_SUBSCRIBING,                                                                      /**< Indicates application is subscribed for MQTT topic on the connection. */
+    APP_MQTT_STATE_CONNECTED,
+    APP_MQTT_STATE_SUBSCRIBING,
     APP_MQTT_STATE_SUBSCRIBED
 } app_mqtt_state_t;
 
@@ -154,7 +145,7 @@ typedef struct {
 #define LED_ACCESS_GRANT                    BSP_LED_2_MASK
 #define LED_ACCESS_REJECT                   BSP_LED_3_MASK
 #define ALL_APP_LED                        (BSP_LED_0_MASK | BSP_LED_1_MASK | \
-                                            BSP_LED_2_MASK | BSP_LED_3_MASK)                        /**< Define used for simultaneous operation of all application LEDs. */
+                                            BSP_LED_2_MASK | BSP_LED_3_MASK)
 
 #define BTN_DBG								BUTTON_1
 #define BTN_PRG								BUTTON_2
@@ -166,11 +157,11 @@ typedef struct {
 #define MOTOR_IN2							30
 #define MOTOR_STBY							31
 
-#define LWIP_SYS_TICK_MS                    10                                                      /**< Interval for timer used as trigger to send. */
+#define LWIP_SYS_TICK_MS                    10
 
 #define LED_BLINK_CXN_MULT1					4
 #define LED_BLINK_CXN_MULT2					2
-#define LED_BLINK_INTERVAL_MS               150                                                     /**< LED blinking interval. */
+#define LED_BLINK_INTERVAL_MS               150
 #define LED_BLINK_CXN_STABLE_MULT			64
 #define LED_BLINK_CXN_STABLE_COUNT			2
 #define LED_BLINK_ACCESS_MULT				12
@@ -186,7 +177,7 @@ typedef struct {
 
 #define UUID_STRLEN							36														/**< Length of UUID (not including \0 ) */
 
-#define SCHED_MAX_EVENT_DATA_SIZE           sizeof(worker_pub_param_t)                                                      /**< Maximum size of scheduler events. */
+#define SCHED_MAX_EVENT_DATA_SIZE           sizeof(worker_pub_param_t)                              /**< Maximum size of scheduler events. */
 #define SCHED_QUEUE_SIZE                    128                                                     /**< Maximum number of events in the scheduler queue. */
 
 #define DEAD_BEEF                           0xDEADBEEF                                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
@@ -264,9 +255,15 @@ static bool									led_cxn_stable_blinkon = false;
 static int8_t								led_access_blink_count = 0;
 eui48_t 									ipv6_medium_eui48;
 
+static ipv6_addr_t ipv6_broker_addr =
+        { .u8 = { 0xfe, 0x80, 0x00, 0x00,
+                  0x00, 0x00, 0x00, 0x00,
+                  0x00, 0x00, 0x00, 0x00,
+                  0x00, 0x00, 0x00, 0x00, } };
+
 static bool									led_dbg_on = false;
 //#define FAR_SECURE_ENABLED 0
-#if defined(FAR_SECURE_ENABLED)
+#if (FAR_SECURE_ENABLED == 1)
 
 static const char tls_cert[] = "-----BEGIN CERTIFICATE-----\n"
                                "MIIDaTCCAVGgAwIBAgIBBDANBgkqhkiG9w0BAQsFADAfMR0wGwYDVQQDDBRTcG9v\n"
@@ -561,21 +558,17 @@ static void connect_to_broker(void * p_event_data, uint16_t event_size) {
         m_pass.p_utf_str = (uint8_t *)username_utf8_buf;
         m_pass.utf_strlen = wcslen(username_wcs);
 
-        ipv6_addr_t ipv6addr = { .u8 = {0xfe, 0x80} };
-
-        memset(ipv6addr.u8 + 2, 0, 14);
+        memset(ipv6_broker_addr.u8 + 2, 0, 14);
 
         if (p_iot_interface) {
 
-            p_iot_interface->p_transport;
+            memcpy(ipv6_broker_addr.u8 + EUI_64_ADDR_SIZE, p_iot_interface->peer_addr.identifier, EUI_64_ADDR_SIZE);
 
-            memcpy(ipv6addr.u8 + EUI_64_ADDR_SIZE, p_iot_interface->peer_addr.identifier, EUI_64_ADDR_SIZE);
+#if (BLE_6LOWPAN_LEGACY_MODE == 1)
+            ipv6_broker_addr.u8[EUI_64_ADDR_SIZE] |= 0x02;
+#endif
 
-//        ipv6addr.u8[EUI_64_ADDR_SIZE] |= 0x02;
-
-            memcpy(client->broker_addr.u8, ipv6addr.u8, IPV6_ADDR_SIZE);
-
-//            memcpy(client->broker_addr.u8, m_broker_addr.u8, IPV6_ADDR_SIZE);
+            memcpy(client->broker_addr.u8, ipv6_broker_addr.u8, IPV6_ADDR_SIZE);
 
             client->protocol_version = MQTT_VERSION_3_1_1;
 
