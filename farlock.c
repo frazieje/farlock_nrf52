@@ -931,6 +931,7 @@ static void lock()
     {
         APPL_LOG("aborting lock operation");
     }
+    led_dbg_on = true;
 }
 
 static void unlock()
@@ -951,6 +952,7 @@ static void unlock()
     {
         APPL_LOG("aborting unlock operation");
     }
+    led_dbg_on = false;
 }
 
 static void set_lock_state_from_pos_switch(void)
@@ -961,11 +963,13 @@ static void set_lock_state_from_pos_switch(void)
         {
             APPL_LOG("set lock state = locked");
             m_lock_state = LOCK_STATE_LOCKED;
+            led_dbg_on = true;
         }
         else
         {
             APPL_LOG("set lock state = unlocked");
             m_lock_state = LOCK_STATE_UNLOCKED;
+            led_dbg_on = false;
         }
     }
     else
@@ -974,11 +978,13 @@ static void set_lock_state_from_pos_switch(void)
         {
             APPL_LOG("set lock state = unlocked");
             m_lock_state = LOCK_STATE_UNLOCKED;
+            led_dbg_on = false;
         }
         else
         {
             APPL_LOG("set lock state = locked");
             m_lock_state = LOCK_STATE_LOCKED;
+            led_dbg_on = true;
         }
     }
 }
