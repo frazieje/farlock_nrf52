@@ -6085,7 +6085,7 @@
  
 
 #ifndef BLE_6LOWPAN_LEGACY_MODE
-#define BLE_6LOWPAN_LEGACY_MODE 1
+#define BLE_6LOWPAN_LEGACY_MODE 0
 #endif
 
 // </h> 
