@@ -121,8 +121,8 @@ typedef struct {
 
 #define LED_BLINK_CXN_MULT1					4
 #define LED_BLINK_CXN_MULT2					2
-#define LED_BLINK_INTERVAL_MS               150
-#define LED_BLINK_CXN_STABLE_MULT			64
+#define LED_BLINK_INTERVAL_MS               150 //this is the timeout timer callbacks
+#define LED_BLINK_CXN_STABLE_MULT			200 //this makes the status light blink twice rapidly every (LED_BLINK_CXN_STABLE_MULT * LED_BLINK_INTERVAL_MS) milliseconds
 #define LED_BLINK_CXN_STABLE_COUNT			2
 #define LED_BLINK_ACCESS_MULT				12
 #define AUTOCONNECT_TIMER_INTERVAL_MS       1000
@@ -923,9 +923,9 @@ static void lock()
         m_lock_state = LOCK_STATE_LOCKING;
         m_pending_lock_state = LOCK_STATE_LOCKED;
         actuate_motor(100, m_lock_direction);
-        app_timer_start(m_pwm_timer_src_id,
-                        APP_TIMER_TICKS(m_lock_direction == LOCK_DIRECTION_LEFT ? ACTUATE_LEFT_TIMEOUT_MS : ACTUATE_RIGHT_TIMEOUT_MS),
-                        &m_pending_lock_state);
+//        app_timer_start(m_pwm_timer_src_id,
+//                        APP_TIMER_TICKS(m_lock_direction == LOCK_DIRECTION_LEFT ? ACTUATE_LEFT_TIMEOUT_MS : ACTUATE_RIGHT_TIMEOUT_MS),
+//                        &m_pending_lock_state);
     }
     else
     {
@@ -944,9 +944,9 @@ static void unlock()
         m_lock_state = LOCK_STATE_UNLOCKING;
         m_pending_lock_state = LOCK_STATE_UNLOCKED;
         actuate_motor(100, m_lock_direction == LOCK_DIRECTION_LEFT ? LOCK_DIRECTION_RIGHT : LOCK_DIRECTION_LEFT);
-        app_timer_start(m_pwm_timer_src_id,
-                        APP_TIMER_TICKS(m_lock_direction == LOCK_DIRECTION_LEFT ? ACTUATE_RIGHT_TIMEOUT_MS : ACTUATE_LEFT_TIMEOUT_MS),
-                        &m_pending_lock_state);
+//        app_timer_start(m_pwm_timer_src_id,
+//                        APP_TIMER_TICKS(m_lock_direction == LOCK_DIRECTION_LEFT ? ACTUATE_RIGHT_TIMEOUT_MS : ACTUATE_LEFT_TIMEOUT_MS),
+//                        &m_pending_lock_state);
     }
     else
     {
@@ -1018,6 +1018,11 @@ static void button_event_handler(uint8_t pin_no, uint8_t button_action)
             case SW_LOCK_POS:
             {
                 APPL_LOG("lock position switch on");
+                if (m_lock_state == LOCK_STATE_LOCKING || m_lock_state == LOCK_STATE_UNLOCKING) {
+                    app_timer_start(m_pwm_timer_src_id,
+                                    APP_TIMER_TICKS(250),
+                                    &m_pending_lock_state);
+                }
                 if (m_lock_direction == LOCK_DIRECTION_LEFT)
                 {
                     APPL_LOG("set state to unlocked");
@@ -1060,6 +1065,11 @@ static void button_event_handler(uint8_t pin_no, uint8_t button_action)
             case SW_LOCK_POS:
             {
                 APPL_LOG("lock position switch off");
+                if (m_lock_state == LOCK_STATE_LOCKING || m_lock_state == LOCK_STATE_UNLOCKING) {
+                    app_timer_start(m_pwm_timer_src_id,
+                                    APP_TIMER_TICKS(250),
+                                    &m_pending_lock_state);
+                }
                 if (m_lock_direction == LOCK_DIRECTION_LEFT)
                 {
                     APPL_LOG("set state to locked");
